@@ -1,27 +1,26 @@
 import dendropy
 
 def infer_gaps_in_tree(df_seq, tree, id_col='id', sequence_col='sequence'):
-    """Adds a character matrix to DendroPy tree and infers gaps using
-    Fitch's algorithm.
+    """문자 매트릭스를 DendroPy 트리에 추가하고 Fitch 알고리즘을 사용하여 갭을 추론합니다.
 
-    Infer gaps in sequences at ancestral nodes.
+    조상 노드의 서열에서 갭을 추론합니다.
     """
     taxa = tree.taxon_namespace
 
-    # Get alignment as fasta
+    # fasta로 정렬을 가져옵니다.
     alignment = df_seq.phylo.to_fasta(id_col=id_col, id_only=True,
                                       sequence_col=sequence_col)
 
-    # Build a Sequence data matrix from Dendropy
+    # Dendropy에서 서열 데이터 매트릭스를 빌드합니다.
     data = dendropy.ProteinCharacterMatrix.get(
         data=alignment,
         schema="fasta",
         taxon_namespace=taxa)
 
-    # Construct a map object between sequence data and tree data.
+    # 서열 데이터와 트리 데이터 간의 맵 객체를 구성합니다.
     taxon_state_sets_map = data.taxon_state_sets_map(gaps_as_missing=False)
 
-    # Fitch algorithm to determine placement of gaps
+    # 갭 배치를 결정하는 Fitch 알고리즘
     dendropy.model.parsimony.fitch_down_pass(tree.postorder_node_iter(),
             taxon_state_sets_map=taxon_state_sets_map)
     dendropy.model.parsimony.fitch_up_pass(tree.preorder_node_iter())
