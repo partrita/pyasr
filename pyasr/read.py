@@ -8,46 +8,46 @@ def read_codeml_output(
     df,
     altall_cutoff=0.2,
     ):
-    """Read codeml file.
+    """codeml 파일을 읽습니다.
     """
-    # Read paml output.
+    # paml 출력을 읽습니다.
     with open(filename, 'r') as f:
         data = f.read()
 
-    # Rip all trees out of the codeml output.
+    # codeml 출력에서 모든 트리를 추출합니다.
     regex = re.compile('\([()\w\:. ,]+;')
     trees = regex.findall(data)
     anc_tree = trees[2]
 
-    # First tree in codeml file is the original input tree
+    # codeml 파일의 첫 번째 트리는 원본 입력 트리입니다.
     tip_tree = dendropy.Tree.get(data=trees[0], schema='newick')
 
-    # Third tree in codeml fule is ancestor tree.
+    # codeml 파일의 세 번째 트리는 조상 트리입니다.
     anc_tree = dendropy.Tree.get(data=trees[2], schema='newick')
 
-    # Main tree to return
+    # 반환할 메인 트리
     tree = tip_tree
 
-    # Map ancestors onto main tree object
+    # 조상을 메인 트리 객체에 매핑합니다.
     ancestors = anc_tree.internal_nodes()
     for i, node in enumerate(tree.internal_nodes()):
         node.label = ancestors[i].label
 
-    # Map nodes onto dataframe.
+    # 노드를 데이터프레임에 매핑합니다.
     df['reconstruct_label'] = None
     for node in tree.postorder_node_iter():
 
-        # Ignore parent node
+        # 부모 노드를 무시합니다.
         if node.parent_node is None:
             pass
 
         elif node.is_leaf():
             node_label = node.taxon.label
             parent_label = node.parent_node.label
-            # Set node label.
+            # 노드 레이블을 설정합니다.
             df.loc[df.uid == node_label, 'reconstruct_label'] = node_label
 
-            # Set parent label.
+            # 부모 레이블을 설정합니다.
             parent_id = df.loc[df.uid == node_label, 'parent'].values[0]
             df.loc[df.id == parent_id, 'reconstruct_label'] = node.parent_node.label
 
@@ -57,35 +57,35 @@ def read_codeml_output(
             df.loc[df.id == parent_id, 'reconstruct_label'] = node.parent_node.label
 
 
-    # Compile a regular expression to find blocks of data for internal nodes
+    # 내부 노드에 대한 데이터 블록을 찾기 위한 정규 표현식을 컴파일합니다.
     node_regex = re.compile("""Prob distribution at node [0-9]+, by site[-\w():.\s]+\n""")
 
-    # Strip the node number from this block of data.
+    # 이 데이터 블록에서 노드 번호를 추출합니다.
     node_num_regex = re.compile("[0-9]+")
 
-    # Get dataframes for all ancestors.
+    # 모든 조상에 대한 데이터프레임을 가져옵니다.
     df['ml_sequence'] = None
     df['ml_posterior'] = None
     df['alt_sequence'] = None
     df['alt_posterior'] = None
 
     for node in node_regex.findall(data):
-        # Get node label
+        # 노드 레이블 가져오기
         node_label = node_num_regex.search(node).group(0)
 
-        # Compile regex for matching site data
+        # 사이트 데이터와 일치하는 정규식 컴파일
         site_regex = re.compile("(?:\w\(\w.\w{3}\) )+")
 
-        # Iterate through each match for site data.
+        # 사이트 데이터의 각 일치 항목을 반복합니다.
         ml_sequence, ml_posterior, alt_sequence, alt_posterior = [], [], [], []
 
         for site in site_regex.findall(node):
 
-            # Iterate through residues
+            # 잔기를 반복합니다.
             scores = [float(site[i+2:i+7]) for i in range(0,len(site), 9)]
             residues = [site[i] for i in range(0, len(site), 9)]
 
-            # Get the indices of sorted scores
+            # 정렬된 점수의 인덱스를 가져옵니다.
             sorted_score_index = [i[0] for i in sorted(
                 enumerate(scores),
                 key=lambda x:x[1],
@@ -94,7 +94,7 @@ def read_codeml_output(
             ml_idx = sorted_score_index[0]
             alt_idx = sorted_score_index[1]
 
-            # Should we keep alterative site.
+            # 대체 사이트를 유지해야 하는지 확인합니다.
             ml_sequence.append(residues[ml_idx])
             ml_posterior.append(scores[ml_idx])
 

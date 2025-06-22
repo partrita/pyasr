@@ -1,0 +1,58 @@
+[project]
+name = "pyasr"
+version = "0.6.1"
+description = "Ancestral Sequence Reconstruction in Python"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Haris Hasic", email = "haris.hasic@gmail.com"}
+]
+maintainers = [
+    {name = "Haris Hasic", email = "haris.hasic@gmail.com"}
+]
+keywords = ["bioinformatics", "evolution", "ancestral sequence reconstruction", "phylogenetics"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+dependencies = [
+    "dendropy",
+    "pandas>=0.20.3",
+    "numpy>=1.22.0,<1.27.0",
+    "biopython==1.77",
+    "phylopandas",
+    "toytree"
+]
+
+[project.urls]
+Homepage = "https://github.com/hariszaf/pyasr"
+Documentation = "https://github.com/hariszaf/pyasr"
+Repository = "https://github.com/hariszaf/pyasr.git"
+"Bug Tracker" = "https://github.com/hariszaf/pyasr/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyasr*"]
+exclude = ["docs*", "examples*", "tests*"]
+
+[tool.uv]
+# Manage project dependencies with uv
+# See https://astral.sh/blog/uv#managing-project-dependencies
+# for more details.
+dev-dependencies = [
+    "jupyter"
+]

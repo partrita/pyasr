@@ -7,7 +7,7 @@ from Bio.Phylo.PAML import codeml
 
 from .read import read_codeml_output
 
-# Run paml
+# paml 실행
 def reconstruct(
     df,
     id_col='uid',
@@ -22,7 +22,7 @@ def reconstruct(
 
     df = df.copy()
 
-    # Construct default arguments
+    # 기본 인수 구성
     default_options = dict(verbose=9, CodonFreq=None, cleandata=0,
         fix_blength=2, NSsites=None, fix_omega=None, clock=None,
         ncatG=8, runmode=0, fix_kappa=None, fix_alpha=1, Small_Diff=1.0e-6,
@@ -30,11 +30,11 @@ def reconstruct(
         alpha=None, seqtype=2, omega=None, getSE=None, noisy=3, Mgene=None,
         kappa=None, model=3, ndata=None)
 
-    # Update default arguments in place.
+    # 기본 인수를 현재 값으로 업데이트합니다.
     default_options.update(**kwargs)
 
-    # ---------------- Prepare model ----------------
-    # copy model from package to project directory.
+    # ---------------- 모델 준비 ----------------
+    # 패키지에서 프로젝트 디렉토리로 모델을 복사합니다.
     path_to_model = pkg_resources.resource_filename(
         'pyasr', os.path.join('dat', '{}.dat'.format(aaRatefile)))
 
@@ -71,7 +71,7 @@ def reconstruct(
         suppress_internal_node_labels=True,
     )
 
-    # Build and write out control file.
+    # 제어 파일을 빌드하고 저장합니다.
     cml = codeml.Codeml(alignment=ali_path,
         tree=tree_path,
         out_file=out_path,
